@@ -8,6 +8,10 @@ var userModels = {
                 return resolve(result);
             })
         })
+    },
+
+    verifyEmail: function(email, callback){
+        db.query("select * from users where email_id = $1", [email], callback)
     }
 }
 
