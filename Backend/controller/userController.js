@@ -50,8 +50,8 @@ var userController = {
                         })
                     }else{
                         if(result.rows.length > 0){
-                            // var decodedPass = (passcode, result.rows[0]['password']);
-                            if(passcode === result.rows[0]['password']){
+                            var decodedPass = (passcode, result.rows[0]['password']);
+                            if(decodedPass){//passcode === result.rows[0]['password']
                                 var token = jwt.sign({
                                     id: result.rows[0]['user_id']
                                 },"secretKeyJK@123")
