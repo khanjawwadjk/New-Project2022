@@ -54,7 +54,7 @@ var userController = {
                             if(decodedPass){//passcode === result.rows[0]['password']
                                 var token = jwt.sign({
                                     id: result.rows[0]['user_id']
-                                },"secretKeyJK@123")
+                                },process.env.SECRET_KEY)
 
                                 res.status(200).send({
                                     status:true,
