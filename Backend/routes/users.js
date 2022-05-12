@@ -7,4 +7,11 @@ router.get('/getusers', function(req, res) {
   userController.getUsers(req, res);
 });
 
+router.post('/login',(req, res)=>{
+  userController.loginByEmail(req, res);
+})
+
+router.post('/userRegistration', (req, res)=>{
+  userController.userRegistration(req, res);
+})
 module.exports = router;
