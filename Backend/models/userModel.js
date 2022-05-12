@@ -12,6 +12,10 @@ var userModels = {
 
     verifyEmail: function(email, callback){
         db.query("select * from users where email_id = $1", [email], callback)
+    },
+
+    userRegister: function(regData, lowerEmail, password,callback){
+        db.query("insert into users(first_name, last_name, email_id, password) values ($1, $2, $3, $4) returning user_id",[regData.first_name, regData.last_name, lowerEmail, password],callback);
     }
 }
 

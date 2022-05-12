@@ -1,7 +1,9 @@
 const bcrypt = require('bcrypt'),
-      jwt = require('jsonwebtoken');
-var userModels = require('../models/userModel')
+      jwt = require('jsonwebtoken'),
+      validator = require('validator');
 
+var userModels = require('../models/userModel')
+var isEmpty = require('../controller/isEmpty')
 
 var userController = {
     getUsers: (req, res) => {
@@ -83,6 +85,78 @@ var userController = {
     }
         userLogin();
     },   
+
+    userRegistration:(req, res)=>{
+        var regData = req.body;
+        var fname = regData.first_name; 
+        var lname = regData.last_name; 
+        var pass = regData.password; 
+        var email = regData.email; 
+        let errors = {};
+
+        if(validator.isEmpty(fname)) {
+            errors.firstName = "first name is required !!"
+        }
+        if(validator.isEmpty(lname)) {
+            errors.lastName = "last name is required !!"
+        }
+        if(validator.isEmpty(email)) {
+            errors.firstName = "email is required !!"
+        }
+        if(!validator.isEmail(email,{
+            min:2,
+            max:15
+        })){
+            errors.email = "Invalid email"
+        }
+        var lowerEmail = email.toLowerCase();
+
+        if(Object.keys(errors).length > 0){
+            res.status(402).send({
+                status: false,
+                message: "Invalid credentials",
+                data: errors
+            })
+        }else{
+            userModels.verifyEmail(lowerEmail, function(err, result){
+                if(err){
+                    res.status(500).send({
+                        status:false,
+                        message:"Internal server error"
+                    })
+                }else{
+                    if(result.rows.length > 0){
+                        res.status(403).send({
+                            status:false,
+                            message:"Email ID already registered !"
+                        })
+                    }else{
+                        const hashedPass = bcrypt.hashSync(pass, 12);
+                        console.log("hashedPass----->", hashedPass)
+                        userModels.userRegister(regData, lowerEmail, hashedPass,function(err, result){
+                            if(err){
+                                res.status(500).send({
+                                    status:false,
+                                    message:"Internal server error"
+                                })
+                            }else if(result.rows.length > 0){
+                                res.status(200).send({
+                                    status:true,
+                                    message:"Registration done successfully !!"
+                                })
+                            }else{
+                                res.status(400).send({
+                                    status:false,
+                                    message:"something went wrong"
+                                })
+                            }
+                        })
+                    }
+                }
+            })
+        }
+
+    },
 }
 
 module.exports = userController;
